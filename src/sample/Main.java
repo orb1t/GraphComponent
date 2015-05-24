@@ -2,66 +2,51 @@ package sample;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
-import javafx.scene.Parent;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.*;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 import javafx.stage.Stage;
-import sun.jvm.hotspot.HelloWorld;
+import jp.iboy.component.graph.layout.GraphPaneBuilder;
+import jp.iboy.component.graph.model.Edge;
+import jp.iboy.component.graph.model.Node;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Main extends Application {
     class Delta {double x,y;}
 
     final Delta dragDelta = new Delta();
+    final Pane canvas = new Pane();
+
+
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Pane canvas = new Pane();
-        canvas.setStyle("-fx-background-color: black;");
-        canvas.setPrefSize(200,200);
-        Circle circle = new Circle(50, Color.BLUE);
-        circle.relocate(20, 20);
-        final Rectangle rectangle = new Rectangle(100,100, Color.RED);
-        rectangle.relocate(100,100);
+        Node node1 = new Node("node1", 50, 50, 100, 100);
+        Node node2 = new Node("node2", 50, 50, 100, 200);
+        Node node3 = new Node("node3", 50, 50, 200, 200);
 
-        rectangle.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                dragDelta.x = rectangle.getLayoutX() - event.getSceneX();
-                dragDelta.y = rectangle.getLayoutY() - event.getSceneY();
-                rectangle.setCursor(Cursor.MOVE);
-            }
-        });
-        rectangle.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                rectangle.setCursor(Cursor.HAND);
-            }
-        });
-        rectangle.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                rectangle.setLayoutX(event.getSceneX() + dragDelta.x);
-                rectangle.setLayoutY(event.getSceneY() + dragDelta.y);
-            }
-        });
-        rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                rectangle.setCursor(Cursor.HAND);
-            }
-        });
+        Edge edge1 = new Edge(node1, node2);
+        Edge edge2 = new Edge(node1, node3);
 
-        final boolean b = canvas.getChildren().addAll(circle, rectangle);
-        Scene scene = new Scene(canvas, 500, 600);
+        List<Node> nodes = new ArrayList<>();
+        nodes.add(node1);
+        nodes.add(node2);
+        nodes.add(node3);
+
+        List<Edge> edges = new ArrayList<>();
+        edges.add(edge1);
+        edges.add(edge2);
+
+        Scene scene = new Scene(new GraphPaneBuilder(nodes, edges).build(), 500, 600);
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(scene);
         primaryStage.show();
