@@ -1,5 +1,9 @@
 package jp.iboy.component.graph.layout;
 
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.geometry.Orientation;
+import javafx.scene.control.Slider;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import jp.iboy.component.graph.model.Edge;
@@ -17,8 +21,7 @@ import java.util.List;
 public class GraphPaneBuilder {
     private List<? extends Node> nodes;
     private List<? extends Edge> edges;
-
-    private Pane canvas;
+    private Slider slider = new Slider(0, 300, 100);
 
     /**
      * コンストラクタ.
@@ -28,6 +31,9 @@ public class GraphPaneBuilder {
     public GraphPaneBuilder(List<? extends Node> nodes, List<? extends Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
+        slider.setOrientation(Orientation.VERTICAL);
+        slider.setLayoutX(10);
+        slider.setLayoutY(10);
     }
 
     /**
@@ -36,7 +42,7 @@ public class GraphPaneBuilder {
      * ここで行う.
      * @param node コンテキストメニューを追加するnode (基本的にすべてのnode)
      */
-    private void addEventListener(final Node node) {
+    private void addEventListener(final Pane canvas, final Node node) {
         node.setOnMouseClicked((event) -> {
             if (event.getButton().equals(MouseButton.SECONDARY)) {
                 Node.getContextMenu().show(canvas, event.getScreenX(), event.getScreenY());
@@ -51,10 +57,17 @@ public class GraphPaneBuilder {
      * @return グラフが描画されたPane
      */
     public Pane build() {
-        canvas = new Pane();
-        nodes.forEach((node) -> addEventListener(node));
+        final Pane canvas = new Pane();
+        nodes.forEach((node) -> addEventListener(canvas, node));
+
         canvas.getChildren().addAll(edges);
         canvas.getChildren().addAll(nodes);
-        return canvas;
+
+        DoubleProperty property = slider.valueProperty();
+        DoubleBinding binding = property.divide(100);
+        canvas.scaleXProperty().bind(binding);
+        canvas.scaleYProperty().bind(binding);
+
+        return new Pane(canvas, slider);
     }
 }

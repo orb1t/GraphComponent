@@ -51,7 +51,9 @@ public class Node extends Group {
             this.setLayoutX(event.getSceneX() + dragBaseX);
             this.setLayoutY(event.getSceneY() + dragBaseY);
         });
+
     }
+
 
     /**
      * 右クリックした時のコンテキストメニューの追加.
