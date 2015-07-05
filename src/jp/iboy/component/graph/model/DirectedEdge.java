@@ -6,5 +6,5 @@ package jp.iboy.component.graph.model;
  *
  * @author I-BOY
  */
-public class ArrowEdge {
+public class DirectedEdge {
 }

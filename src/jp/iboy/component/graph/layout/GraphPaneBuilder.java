@@ -3,11 +3,13 @@ package jp.iboy.component.graph.layout;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
-import jp.iboy.component.graph.model.Edge;
-import jp.iboy.component.graph.model.Node;
+import jp.iboy.component.graph.model.UndirectedEdge;
+import jp.iboy.component.graph.model.RectangleNode;
 
 import java.util.List;
 
@@ -20,15 +22,19 @@ import java.util.List;
  */
 public class GraphPaneBuilder {
     private List<? extends Node> nodes;
-    private List<? extends Edge> edges;
-    private Slider slider = new Slider(0, 300, 100);
+    private List<? extends UndirectedEdge> edges;
+    private static Slider slider = new Slider(0, 300, 100);
+
+    public static Slider getSlider() {
+        return slider;
+    }
 
     /**
      * コンストラクタ.
      * @param nodes 描画したいnode
      * @param edges 描画したいedge
      */
-    public GraphPaneBuilder(List<? extends Node> nodes, List<? extends Edge> edges) {
+    public GraphPaneBuilder(List<? extends Node> nodes, List<? extends UndirectedEdge> edges) {
         this.nodes = nodes;
         this.edges = edges;
         slider.setOrientation(Orientation.VERTICAL);
@@ -36,20 +42,14 @@ public class GraphPaneBuilder {
         slider.setLayoutY(10);
     }
 
-    /**
-     * nodeのコンテキストメニューの操作を行う.<br/>
-     * ここで操作を行わないと、コンテキストメニューを閉じるなどの操作が難しくなるので、
-     * ここで行う.
-     * @param node コンテキストメニューを追加するnode (基本的にすべてのnode)
-     */
-    private void addEventListener(final Pane canvas, final Node node) {
-        node.setOnMouseClicked((event) -> {
+    public void addContextMenu(final Pane canvas, final Node node, final ContextMenu menu) {
+        node.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.SECONDARY)) {
-                Node.getContextMenu().show(canvas, event.getScreenX(), event.getScreenY());
+                menu.show(canvas, event.getScreenX(), event.getScreenY());
                 event.consume();
             }
         });
-        canvas.setOnMouseClicked((event) -> {Node.getContextMenu().hide();});
+        canvas.setOnMouseClicked(event -> menu.hide());
     }
 
     /**
@@ -58,7 +58,7 @@ public class GraphPaneBuilder {
      */
     public Pane build() {
         final Pane canvas = new Pane();
-        nodes.forEach((node) -> addEventListener(canvas, node));
+        nodes.forEach((node) -> addContextMenu(canvas, node, RectangleNode.getContextMenu()));
 
         canvas.getChildren().addAll(edges);
         canvas.getChildren().addAll(nodes);
